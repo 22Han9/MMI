@@ -1,69 +1,86 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>404 Not Found</title>
+<title>页面未找到</title>
 <style>
+    :root {
+        --bg-1: #0b1f35;
+        --bg-2: #144063;
+        --panel: rgba(11, 30, 49, 0.72);
+        --line: rgba(154, 210, 236, 0.2);
+        --text-main: #f0fbff;
+        --text-sub: #a8c9db;
+        --accent: #1bc5bd;
+        --accent-2: #34d399;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
     body {
         margin: 0;
-        padding: 0;
-        font-family: "Microsoft YaHei", Arial, sans-serif;
-        background-color: #ffffff;
+        min-height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh;
-        color: #333;
+        padding: 18px;
+        font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+        color: var(--text-main);
+        background:
+            radial-gradient(circle at 8% 12%, rgba(56, 189, 248, 0.26), transparent 30%),
+            radial-gradient(circle at 88% 14%, rgba(52, 211, 153, 0.24), transparent 34%),
+            linear-gradient(155deg, var(--bg-1), var(--bg-2));
     }
 
     .container {
+        width: min(520px, 100%);
         text-align: center;
-        padding: 30px 40px;
-        background: #f9f9f9;
-        border-radius: 15px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        border-radius: 22px;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 24px 56px rgba(3, 12, 24, 0.45);
+        padding: 40px 26px 32px;
     }
 
     h1 {
-        font-size: 72px;
+        font-size: clamp(66px, 12vw, 92px);
         margin: 0;
-        background: linear-gradient(to right, #007bff, #00c6ff);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        letter-spacing: 1px;
+        color: #e4fbff;
     }
 
     p {
-        font-size: 20px;
-        margin: 20px 0;
-        color: #555;
+        margin: 12px 0 24px;
+        font-size: 17px;
+        color: var(--text-sub);
+        line-height: 1.7;
     }
 
     .btn {
         display: inline-block;
-        padding: 12px 25px;
-        font-size: 16px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        font-weight: bold;
+        padding: 11px 22px;
+        border-radius: 12px;
         text-decoration: none;
-        transition: all 0.3s;
+        color: #fff;
+        font-weight: 600;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        box-shadow: 0 10px 20px rgba(27, 197, 189, 0.3);
     }
 
     .btn:hover {
-        background-color: #0056b3;
-        transform: scale(1.05);
+        filter: brightness(1.05);
     }
 </style>
 </head>
 <body>
     <div class="container">
         <h1>404</h1>
-        <p>抱歉，您访问的页面不存在！</p>
-        <a href="/menu" class="btn">返回首页</a>
+        <p>抱歉，你访问的页面不存在或已被移动。</p>
+        <a href="/menu" class="btn">返回服务中心</a>
     </div>
 </body>
 </html>

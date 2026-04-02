@@ -1,180 +1,247 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>AI 图像识别助手</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图像识别服务</title>
     <style>
-        /* 全局样式 */
-        body {
-            font-family: "Microsoft YaHei", Arial, sans-serif;
-            background: linear-gradient(135deg, #1f1c2c, #928dab);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            color: #fff;
+        :root {
+            --bg-1: #0b1f35;
+            --bg-2: #144063;
+            --panel: rgba(11, 30, 49, 0.72);
+            --line: rgba(154, 210, 236, 0.2);
+            --text-main: #f0fbff;
+            --text-sub: #a8c9db;
+            --accent: #1bc5bd;
+            --accent-2: #34d399;
         }
 
-        
-        .top-bar {
-            padding: 12px 20px;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(6px);
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            padding: 16px;
+            font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+            color: var(--text-main);
+            background:
+                radial-gradient(circle at 8% 12%, rgba(56, 189, 248, 0.26), transparent 30%),
+                radial-gradient(circle at 88% 14%, rgba(52, 211, 153, 0.24), transparent 34%),
+                linear-gradient(155deg, var(--bg-1), var(--bg-2));
+        }
+
+        .app-shell {
+            max-width: 1000px;
+            margin: 0 auto;
+            height: calc(100vh - 32px);
+            border-radius: 22px;
+            border: 1px solid var(--line);
+            background: var(--panel);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 24px 56px rgba(3, 12, 24, 0.45);
             display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .top-bar {
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.2);
+            gap: 10px;
+            border-bottom: 1px solid var(--line);
+            background: rgba(7, 20, 33, 0.25);
+        }
+
+        .top-bar .title {
+            font-size: 16px;
+            color: var(--text-sub);
         }
 
         .back-btn {
-            padding: 8px 16px;
             border: none;
-            border-radius: 8px;
-            background: #00c3ff;
-            color: #fff;
+            border-radius: 9px;
+            font-size: 13px;
+            padding: 8px 12px;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            box-shadow: 0 0 8px #00c3ff;
-            transition: all 0.3s ease;
-        }
-        .back-btn:hover {
-            background: #00e1ff;
-            box-shadow: 0 0 15px #00e1ff;
-            transform: scale(1.05);
+            color: #e9fdff;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.16);
         }
 
-        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
         .chat-container {
             flex: 1;
+            padding: 18px;
             overflow-y: auto;
-            padding: 20px;
             display: flex;
             flex-direction: column;
             gap: 12px;
-            background: rgba(0,0,0,0.3);
-            backdrop-filter: blur(6px);
+        }
+
+        .empty-tip {
+            margin: auto;
+            text-align: center;
+            color: var(--text-sub);
+            line-height: 1.8;
+            padding: 10px 16px;
+            border: 1px dashed rgba(168, 201, 219, 0.38);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .message {
-            max-width: 70%;
-            padding: 12px 16px;
-            border-radius: 12px;
-            line-height: 1.5;
-            word-wrap: break-word;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            position: relative;
-            animation: fadeIn 0.3s ease;
+            max-width: min(80%, 760px);
+            border-radius: 16px;
+            padding: 12px 14px;
+            line-height: 1.7;
+            word-break: break-word;
+            animation: popIn 0.18s ease;
+        }
+
+        .message-meta {
+            font-size: 12px;
+            opacity: 0.82;
+            margin-bottom: 6px;
         }
 
         .user {
-            background: #00c3ff;
-            color: white;
             align-self: flex-end;
-            border-bottom-right-radius: 0;
+            background: linear-gradient(135deg, #24b2d6, #24caaa);
+            color: #fff;
+            border-bottom-right-radius: 5px;
+            box-shadow: 0 10px 18px rgba(17, 80, 98, 0.35);
         }
 
         .assistant {
-            background: rgba(255,255,255,0.9);
-            color: #111;
             align-self: flex-start;
-            border-bottom-left-radius: 0;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            background: rgba(243, 252, 255, 0.95);
+            color: #163347;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 10px 18px rgba(5, 16, 30, 0.2);
         }
 
         .message img {
-            max-width: 200px;
-            border-radius: 8px;
-            display: block;
             margin-top: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            max-width: min(300px, 100%);
+            border-radius: 12px;
+            display: block;
+            border: 1px solid rgba(255, 255, 255, 0.35);
         }
 
-        /* 输入框样式 */
         .input-box {
-            display: flex;
-            padding: 12px 20px;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(6px);
-            border-top: 1px solid rgba(255,255,255,0.2);
-            gap: 12px;
+            padding: 12px 14px;
+            border-top: 1px solid var(--line);
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            background: rgba(7, 20, 33, 0.25);
         }
 
         input[type="file"] {
-            flex: 1;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            padding: 6px 10px;
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid rgba(199, 236, 255, 0.3);
+            background: rgba(235, 252, 255, 0.1);
+            color: #effdff;
+            padding: 10px;
         }
+
         input[type="file"]::file-selector-button {
             border: none;
-            background: #00c3ff;
-            padding: 6px 12px;
-            border-radius: 6px;
+            border-radius: 8px;
+            margin-right: 10px;
+            padding: 7px 11px;
             color: #fff;
             cursor: pointer;
-            box-shadow: 0 0 6px #00c3ff;
-            transition: all 0.3s ease;
-        }
-        input[type="file"]::file-selector-button:hover {
-            background: #00e1ff;
-            box-shadow: 0 0 12px #00e1ff;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
         }
 
-        button {
-            padding: 0 20px;
+        button[type="submit"] {
             border: none;
-            border-radius: 8px;
-            background: #00c3ff;
-            color: white;
-            font-size: 14px;
+            border-radius: 12px;
+            padding: 0 22px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
             cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 0 8px #00c3ff;
-            transition: all 0.3s ease;
-        }
-        button:hover {
-            background: #00e1ff;
-            box-shadow: 0 0 15px #00e1ff;
-            transform: scale(1.05);
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            box-shadow: 0 10px 20px rgba(27, 197, 189, 0.28);
         }
 
+        @keyframes popIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 760px) {
+            body {
+                padding: 8px;
+            }
+
+            .app-shell {
+                border-radius: 16px;
+                height: calc(100vh - 16px);
+            }
+
+            .message {
+                max-width: 92%;
+            }
+
+            .input-box {
+                grid-template-columns: 1fr;
+            }
+
+            button[type="submit"] {
+                padding: 10px 0;
+            }
+        }
     </style>
 </head>
 <body>
+    <div class="app-shell">
+        <div class="top-bar">
+            <button class="back-btn" onclick="window.location.href='/menu'">返回菜单</button>
+            <div class="title">图像识别服务</div>
+        </div>
 
-    
-    <div class="top-bar">
-        <button class="back-btn" onclick="window.location.href='/menu'">← 返回</button>
+        <div class="chat-container" id="chat-container">
+            <div class="empty-tip" id="empty-tip">
+                上传一张图片，系统会返回识别结果和置信度。
+            </div>
+        </div>
+
+        <form class="input-box" id="upload-form">
+            <input type="file" id="image-input" accept="image/*" required>
+            <button type="submit">上传并识别</button>
+        </form>
     </div>
-
-    
-    <div class="chat-container" id="chat-container"></div>
-
-    
-    <form class="input-box" id="upload-form">
-        <input type="file" id="image-input" accept="image/*" required>
-        <button type="submit">发送图片</button>
-    </form>
 
     <script>
         const chatContainer = document.getElementById('chat-container');
         const uploadForm = document.getElementById('upload-form');
         const imageInput = document.getElementById('image-input');
+        const emptyTip = document.getElementById('empty-tip');
+
+        function toggleEmptyTip() {
+            if (!emptyTip) return;
+            emptyTip.style.display = chatContainer.children.length > 1 ? 'none' : 'block';
+        }
 
         function appendMessage(role, content, imageUrl = null) {
             const msgDiv = document.createElement('div');
             msgDiv.classList.add('message', role);
-
-            msgDiv.innerHTML = `<b>${role === 'user' ? '你' : 'AI'}:</b> ${content}`;
+            msgDiv.innerHTML = `
+                <div class="message-meta">${role === 'user' ? '我' : '系统'}</div>
+                <div>${content}</div>
+            `;
 
             if (imageUrl) {
                 const img = document.createElement('img');
@@ -184,6 +251,7 @@
 
             chatContainer.appendChild(msgDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
+            toggleEmptyTip();
         }
 
         uploadForm.addEventListener('submit', async (e) => {
@@ -192,11 +260,12 @@
 
             const file = imageInput.files[0];
             const reader = new FileReader();
+
             reader.onload = async function(event) {
                 const base64Url = event.target.result;
                 const base64Data = base64Url.split(',')[1];
 
-                appendMessage('user', `已上传图片: ${file.name}`, base64Url);
+                appendMessage('user', `已上传图片：${file.name}`, base64Url);
 
                 const payload = { filename: file.name, image: base64Data };
 
@@ -207,14 +276,13 @@
                         body: JSON.stringify(payload)
                     });
 
-                    if (!response.ok) throw new Error("上传失败");
+                    if (!response.ok) throw new Error('上传失败');
 
                     const data = await response.json();
-                    const aiText = `识别结果: ${data.class_name} (置信度: ${Math.round(data.confidence * 100)}%)`;
-                    appendMessage('assistant', aiText);
-
+                    const text = `识别结果：${data.class_name}（置信度：${Math.round(data.confidence * 100)}%）`;
+                    appendMessage('assistant', text);
                 } catch (err) {
-                    appendMessage('assistant', `[错误] 无法连接到服务器或上传失败: ${err.message}`);
+                    appendMessage('assistant', `[错误] 无法连接到服务器或上传失败：${err.message}`);
                 }
 
                 imageInput.value = '';
@@ -222,7 +290,8 @@
 
             reader.readAsDataURL(file);
         });
-    </script>
 
+        toggleEmptyTip();
+    </script>
 </body>
 </html>
